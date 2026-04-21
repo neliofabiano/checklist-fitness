@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checklist Espaco Fitness</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', sans-serif; background: #0f0f0f; color: #fff; min-height: 100vh; }
+
+/* SELECT SCREEN */
+#selectScreen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 30px; background: linear-gradient(160deg, #1a1400 0%, #0f0f0f 60%); }
+.select-logo { font-size: 3.5rem; margin-bottom: 8px; }
+#selectScreen h1 { font-size: 1.7rem; font-weight: 900; color: #FFD700; text-align: center; letter-spacing: 1px; }
+#selectScreen .subtitle { color: #aaa; font-size: 0.88rem; margin: 8px 0 32px; text-align: center; }
+.unidades-grid { display: flex; flex-direction: column; gap: 13px; width: 100%; max-width: 440px; }
+.unidade-card { background: #1a1a1a; border: 2px solid #2a2a2a; border-radius: 18px; padding: 18px 22px; cursor: pointer; transition: all 0.25s; display: flex; align-items: center; gap: 16px; }
+.unidade-card:hover { border-color: #FFD700; background: #1c1900; transform: scale(1.02); box-shadow: 0 4px 24px rgba(255,215,0,0.15); }
+.u-icon { font-size: 2rem; flex-shrink: 0; }
+.u-info h3 { font-size: 1rem; font-weight: 800; }
+.u-info p { font-size: 0.76rem; color: #888; margin-top: 2px; }
+.u-arrow { margin-left: auto; color: #FFD700; font-size: 1.6rem; font-weight: 300; }
+.beach-card:hover { border-color: #38bdf8; background: #0c1a22; box-shadow: 0 4px 24px rgba(56,189,248,0.12); }
+.beach-card .u-arrow { color: #0ea5e9; }
+.divisor { text-align: center; color: #333; font-size: 0.75rem; letter-spacing: 3px; margin: 2px 0; }
+
+/* HEADER */
+#appScreen { display: none; }
+header { padding: 16px 20px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
+header.fitness { background: linear-gradient(135deg, #FFD700, #FFA500); }
+header.beach { background: linear-gradient(135deg, #0284c7, #38bdf8); }
+header h1 { font-size: 1.05rem; font-weight: 900; color: #000; letter-spacing: 0.5px; }
+header p { font-size: 0.73rem; color: rgba(0,0,0,0.65); margin-top: 2px; }
+.back-btn { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.2); border: none; color: #000; border-radius: 50%; width: 34px; height: 34px; font-size: 1.2rem; cursor: pointer; font-weight: 700; }
+
+/* PROGRESS */
+.progress-wrap { background: #1a1a1a; padding: 12px 20px; position: sticky; top: 74px; z-index: 99; border-bottom: 1px solid #2a2a2a; }
+.progress-info { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px; color: #ccc; }
+.progress-bar-bg { background: #2a2a2a; border-radius: 50px; height: 9px; overflow: hidden; }
+.progress-bar-fill { height: 100%; border-radius: 50px; transition: width 0.4s ease; width: 0%; }
+.bar-fitness { background: linear-gradient(90deg, #FFD700, #FFA500); }
+.bar-beach { background: linear-gradient(90deg, #0284c7, #38bdf8); }
+
+/* CHECKLIST */
+.container { padding: 14px 16px 140px; max-width: 600px; margin: 0 auto; }
+.section { background: #1a1a1a; border-radius: 16px; margin-bottom: 13px; overflow: hidden; border: 1px solid #2a2a2a; }
+.section-header { background: #222; padding: 12px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #2a2a2a; }
+.section-header h2 { font-size: 0.92rem; font-weight: 700; }
+.badge { margin-left: auto; border-radius: 50px; padding: 2px 10px; font-size: 0.7rem; font-weight: 700; background: #444; transition: background 0.3s; }
+.badge.done { background: #22c55e; }
+.item { display: flex; align-items: center; padding: 12px 16px; gap: 12px; cursor: pointer; border-bottom: 1px solid #1e1e1e; transition: background 0.2s; user-select: none; -webkit-tap-highlight-color: transparent; }
+.item:last-child { border-bottom: none; }
+.item:active { background: #2a2a2a; }
+.item.checked { background: #0d2e1a; }
+.item.checked .item-text { color: #22c55e; text-decoration: line-through; opacity: 0.7; }
+.item.beach-item.checked { background: #0a1e2e; }
+.item.beach-item.checked .item-text { color: #38bdf8; }
+.checkbox { width: 26px; height: 26px; border-radius: 8px; border: 2px solid #444; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; font-size: 1rem; color: #fff; }
+.item.checked .checkbox { background: #22c55e; border-color: #22c55e; }
+.item.beach-item.checked .checkbox { background: #0284c7; border-color: #0284c7; }
+.item-text { font-size: 0.9rem; line-height: 1.3; }
+
+/* VIDEO */
+.video-section { background: #1a1a1a; border-radius: 16px; padding: 20px; margin-bottom: 14px; text-align: center; }
+.video-section.fitness { border: 2px dashed #FFD700; }
+.video-section.beach { border: 2px dashed #0284c7; }
+.video-section h3 { font-size: 0.95rem; margin-bottom: 6px; }
+.video-section.fitness h3 { color: #FFD700; }
+.video-section.beach h3 { color: #38bdf8; }
+.video-section p { font-size: 0.78rem; color: #888; margin-bottom: 12px; }
+.video-upload-btn { color: #000; border: none; padding: 12px 24px; border-radius: 50px; font-size: 0.92rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.video-upload-btn.fitness { background: linear-gradient(135deg, #FFD700, #FFA500); }
+.video-upload-btn.beach { background: linear-gradient(135deg, #0284c7, #38bdf8); color: #fff; }
+.video-preview { margin-top: 12px; display: none; }
+.video-preview video { width: 100%; border-radius: 10px; max-height: 180px; }
+.video-ok { margin-top: 8px; color: #22c55e; font-weight: 700; font-size: 0.85rem; }
+#fileInput { display: none; }
+
+/* FOOTER */
+.footer-fixed { position: fixed; bottom: 0; left: 0; right: 0; padding: 12px 16px; background: #111; border-top: 1px solid #2a2a2a; flex-direction: column; gap: 7px; display: none; }
+.footer-fixed.visible { display: flex; }
+.btn-finalizar { color: #000; border: none; padding: 15px; border-radius: 14px; font-size: 1rem; font-weight: 900; cursor: pointer; width: 100%; opacity: 0.3; pointer-events: none; transition: all 0.3s; }
+.btn-finalizar.fitness-btn { background: linear-gradient(135deg, #FFD700, #FFA500); }
+.btn-finalizar.beach-btn { background: linear-gradient(135deg, #0284c7, #38bdf8); color: #fff; }
+.btn-finalizar.active { opacity: 1; pointer-events: all; box-shadow: 0 4px 20px rgba(255,215,0,0.3); }
+.btn-status { text-align: center; font-size: 0.74rem; color: #666; }
+
+/* SUCCESS SCREEN */
+#successScreen { display: none; position: fixed; inset: 0; background: #0f0f0f; z-index: 999; flex-direction: column; align-items: center; justify-content: flex-start; padding: 36px 24px 40px; text-align: center; overflow-y: auto; }
+#successScreen.show { display: flex; }
+.success-icon { font-size: 4rem; margin-bottom: 12px; }
+#successScreen h2 { font-size: 1.6rem; font-weight: 900; color: #FFD700; margin-bottom: 6px; }
+.unidade-label { font-size: 0.95rem; font-weight: 700; color: #aaa; margin-bottom: 4px; }
+#successDateTime { color: #666; font-size: 0.85rem; margin-bottom: 20px; }
+
+/* RESUMO */
+.resumo-box { background: #1a1a1a; border-radius: 14px; padding: 16px; margin-bottom: 18px; width: 100%; max-width: 420px; text-align: left; border: 1px solid #2a2a2a; }
+.resumo-box h4 { font-size: 0.82rem; color: #888; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+.resumo-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #222; font-size: 0.88rem; }
+.resumo-item:last-child { border-bottom: none; }
+.resumo-ok { color: #22c55e; font-weight: 700; font-size: 0.8rem; }
+
+/* WHATSAPP */
+.whatsapp-section { width: 100%; max-width: 420px; margin-bottom: 14px; }
+.whatsapp-section label { font-size: 0.8rem; color: #aaa; display: block; margin-bottom: 8px; text-align: left; }
+.wp-input { background: #1a1a1a; border: 1px solid #333; border-radius: 10px; color: #fff; font-size: 0.95rem; padding: 11px 14px; width: 100%; outline: none; margin-bottom: 10px; }
+.wp-input:focus { border-color: #25D366; }
+.btn-whatsapp { background: linear-gradient(135deg, #25D366, #128C7E); color: #fff; border: none; padding: 14px 20px; border-radius: 14px; font-size: 0.92rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px; width: 100%; justify-content: center; margin-bottom: 10px; box-shadow: 0 4px 20px rgba(37,211,102,0.3); }
+.btn-whatsapp-group { background: linear-gradient(135deg, #128C7E, #075E54); color: #fff; border: none; padding: 14px 20px; border-radius: 14px; font-size: 0.92rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px; width: 100%; justify-content: center; margin-bottom: 10px; box-shadow: 0 4px 20px rgba(7,94,84,0.3); }
+.btn-reiniciar { background: #1a1a1a; color: #fff; border: 1px solid #333; padding: 13px 28px; border-radius: 50px; font-size: 0.88rem; font-weight: 700; cursor: pointer; width: 100%; max-width: 420px; }
+.divider-or { color: #444; font-size: 0.78rem; text-align: center; margin: 4px 0; }
+.nota-video { background: #1a1500; border: 1px solid #333; border-radius: 10px; padding: 10px 14px; font-size: 0.78rem; color: #aaa; margin-bottom: 14px; width: 100%; max-width: 420px; text-align: left; }
+.nota-video strong { color: #FFD700; }
+</style>
+</head>
+<body>
+
+<!-- TELA INICIAL -->
+<div id="selectScreen">
+  <div class="select-logo">&#127947;</div>
+  <h1>ESPACO FITNESS</h1>
+  <p class="subtitle">Selecione a unidade para iniciar o checklist</p>
+  <div class="unidades-grid">
+
+    <div class="unidade-card" onclick="iniciar('pele')">
+      <div class="u-icon">&#127968;</div>
+      <div class="u-info"><h3>Espaco Fitness &mdash; Rua Pele</h3><p>Unidade Rua Pele &bull; 23 itens</p></div>
+      <div class="u-arrow">&#8250;</div>
+    </div>
+
+    <div class="unidade-card" onclick="iniciar('prime')">
+      <div class="u-icon">&#127978;</div>
+      <div class="u-info"><h3>Espaco Fitness &mdash; Prime Mall</h3><p>Unidade Shopping Prime Mall &bull; 23 itens</p></div>
+      <div class="u-arrow">&#8250;</div>
+    </div>
+
+    <div class="unidade-card" onclick="iniciar('nacoes')">
+      <div class="u-icon">&#11088;</div>
+      <div class="u-info"><h3>Espaco Fitness &mdash; Nacoes</h3><p>Unidade Jardim das Nacoes &bull; 23 itens</p></div>
+      <div class="u-arrow">&#8250;</div>
+    </div>
+
+    <div class="divisor">&#8212; &nbsp; &#8212;</div>
+
+    <div class="unidade-card beach-card" onclick="iniciar('beach')">
+      <div class="u-icon">&#127958;</div>
+      <div class="u-info"><h3>Espaco Beach</h3><p>Unidade Beach &bull; 20 itens especificos</p></div>
+      <div class="u-arrow">&#8250;</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- APP CHECKLIST -->
+<div id="appScreen">
+  <header id="appHeader" class="fitness">
+    <button class="back-btn" onclick="voltarSelecao()">&#8249;</button>
+    <h1 id="headerTitle">ESPACO FITNESS</h1>
+    <p id="headerSub">Checklist de Vistoria Diaria</p>
+  </header>
+  <div class="progress-wrap">
+    <div class="progress-info"><span id="progressText">0 de 23 itens</span><span id="progressPct">0%</span></div>
+    <div class="progress-bar-bg"><div class="progress-bar-fill bar-fitness" id="progressFill"></div></div>
+  </div>
+  <div class="container" id="checklistContainer"></div>
+  <div class="footer-fixed" id="footerFixed">
+    <button class="btn-finalizar fitness-btn" id="btnFinalizar" onclick="finalizar()">&#128274; Finalize o Checklist</button>
+    <p class="btn-status" id="btnStatus">Marque todos os itens e anexe o video</p>
+  </div>
+</div>
+
+<!-- TELA DE SUCESSO -->
+<div id="successScreen">
+  <div class="success-icon">&#127942;</div>
+  <h2>Checklist Concluido!</h2>
+  <p class="unidade-label" id="successUnidade"></p>
+  <p id="successDateTime"></p>
+
+  <!-- RESUMO DOS SETORES -->
+  <div class="resumo-box" id="resumoBox"></div>
+
+  <!-- NOTA VIDEO -->
+  <div class="nota-video">&#9888;&#65039; <strong>Video gravado:</strong> O video nao pode ser enviado automaticamente pelo WhatsApp Web. Apos clicar em enviar, anexe o video manualmente na conversa ou grupo.</div>
+
+  <!-- WHATSAPP -->
+  <div class="whatsapp-section">
+    <label>&#128241; Numero ou link do grupo WhatsApp:</label>
+    <input type="tel" class="wp-input" id="whatsappNumber" placeholder="5511999999999 (contato direto)" value="55">
+    <button class="btn-whatsapp" onclick="enviarWhatsapp('direto')">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Enviar para Contato / Numero
+    </button>
+
+    <div class="divider-or">&#9135;&#9135;&#9135; ou enviar para grupo &#9135;&#9135;&#9135;</div>
+
+    <input type="text" class="wp-input" id="whatsappGroupLink" placeholder="Cole aqui o link do grupo (https://chat.whatsapp.com/...)" style="margin-top:8px">
+    <button class="btn-whatsapp-group" onclick="enviarWhatsapp('grupo')">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Enviar para Grupo WhatsApp
+    </button>
+  </div>
+
+  <button class="btn-reiniciar" onclick="reiniciar()">&#128260; Novo Checklist</button>
+</div>
+
+<input type="file" id="fileInput" accept="video/*" onchange="handleVideo(event)">
+
+<script>
+var UNIDADES={
+  pele:{nome:'Espaco Fitness - Rua Pele',tipo:'fitness',icone:'Casa'},
+  prime:{nome:'Espaco Fitness - Prime Mall',tipo:'fitness',icone:'Shopping'},
+  nacoes:{nome:'Espaco Fitness - Nacoes',tipo:'fitness',icone:'Nacoes'},
+  beach:{nome:'Espaco Beach',tipo:'beach',icone:'Beach'}
+};
+var CLF=[
+  {s:'Cozinha',i:'Cozinha',itens:['Pia e bancada limpas e sem louca suja','Lixo esvaziado e saco trocado','Geladeira organizada e sem odores']},
+  {s:'Coletivas',i:'Coletivas',itens:['Sala varrida e higienizada','Espelhos limpos sem manchas','Equipamentos (steps, colchonetes) higienizados','Som e ar-condicionado funcionando']},
+  {s:'Banheiro',i:'Banheiro',itens:['Vasos sanitarios limpos e desinfetados','Chuveiros e ralos desobstruidos','Sabonete e papel higienico abastecidos','Piso seco e sem risco de escorregamento']},
+  {s:'Salao Principal',i:'Salao',itens:['Piso varrido e limpo em toda a extensao','Equipamentos de musculacao higienizados','Anilhas e barras organizadas nos suportes','Halteres organizados em ordem crescente','Espelhos limpos sem manchas','Ar-condicionado limpo e funcionando','TVs e sistema de som operacionais','Lixeiras limpas com saco novo','Bebedouro limpo e com agua gelada','Nenhum equipamento com defeito visivel','Recepcao organizada e limpa','Iluminacao 100% funcionando']}
+];
+var CLB=[
+  {s:'Area de Areia',i:'Areia',itens:['Areia limpa e nivelada','Redes e equipamentos de volei em ordem','Lixeiras esvaziadas e com saco novo','Area delimitada e sinalizada']},
+  {s:'Vestiario e Ducha',i:'Vestiario',itens:['Duchas funcionando e limpas','Piso sem areia acumulada','Sabonete e papel abastecidos','Lixo esvaziado']},
+  {s:'Equipamentos Outdoor',i:'Outdoor',itens:['Equipamentos ao ar livre higienizados','Estruturas sem ferrugem ou danos','Sombreiros e cadeiras organizados','Redes de protecao integras']},
+  {s:'Recepcao e Lanchonete',i:'Recepcao',itens:['Balcao limpo e organizado','Geladeira com produtos abastecidos','Lixo esvaziado','Caixa e sistema funcionando']},
+  {s:'Geral',i:'Geral',itens:['Iluminacao externa funcionando','Acesso e calcada limpos','Som ambiente ligado e regulado','Seguranca e cameras operacionais']}
+];
+
+var u,cl,sD={},sT={},total=0,done=0,videoOk=false,dtFinal='';
+
+function iniciar(key){
+  u=key;
+  var ud=UNIDADES[key];
+  cl=ud.tipo==='beach'?CLB:CLF;
+  sD={};sT={};done=0;total=0;videoOk=false;
+  cl.forEach(function(s){sD[s.s]=0;sT[s.s]=s.itens.length;total+=s.itens.length;});
+  var isB=ud.tipo==='beach';
+  document.getElementById('appHeader').className=isB?'beach':'fitness';
+  document.getElementById('headerTitle').textContent=ud.nome.toUpperCase();
+  document.getElementById('headerSub').textContent='Checklist de Vistoria Diaria';
+  document.getElementById('progressFill').className='progress-bar-fill '+(isB?'bar-beach':'bar-fitness');
+  var btn=document.getElementById('btnFinalizar');
+  btn.className='btn-finalizar '+(isB?'beach-btn':'fitness-btn');
+  var html='';
+  cl.forEach(function(sec){
+    var sid=sec.s.replace(/[^a-z0-9]/gi,'_');
+    html+='<div class="section"><div class="section-header"><span style="margin-right:4px">&#9989;</span><h2>'+sec.s+'</h2><span class="badge" id="b_'+sid+'">0/'+sec.itens.length+'</span></div>';
+    sec.itens.forEach(function(it){
+      html+='<div class="item'+(isB?' beach-item':'')+'" onclick="toggle(this)" data-sec="'+sec.s+'"><div class="checkbox"></div><span class="item-text">'+it+'</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='<div class="video-section '+(isB?'beach':'fitness')+'">';
+  html+='<h3>&#127909; Video de Comprovacao</h3>';
+  html+='<p>Obrigatorio: grave mostrando o estado geral da unidade</p>';
+  html+='<button class="video-upload-btn '+(isB?'beach':'fitness')+'" id="btnVideo" onclick="document.getElementById('fileInput').click()">&#128249; Anexar Video</button>';
+  html+='<div class="video-preview" id="videoPreview"><video id="videoPlayer" controls></video><p class="video-ok">&#9989; Video anexado com sucesso!</p></div>';
+  html+='</div>';
+  document.getElementById('checklistContainer').innerHTML=html;
+  upProg();upBtn();
+  document.getElementById('selectScreen').style.display='none';
+  document.getElementById('appScreen').style.display='block';
+  document.getElementById('footerFixed').classList.add('visible');
+  window.scrollTo(0,0);
+}
+
+function toggle(el){
+  var ok=el.classList.toggle('checked');
+  el.querySelector('.checkbox').textContent=ok?'&#10003;':'';
+  var s=el.dataset.sec;
+  sD[s]+=ok?1:-1;done+=ok?1:-1;
+  upProg();upBadge(s);upBtn();
+}
+
+function upProg(){
+  var pct=total>0?Math.round(done/total*100):0;
+  document.getElementById('progressText').textContent=done+' de '+total+' itens concluidos';
+  document.getElementById('progressPct').textContent=pct+'%';
+  document.getElementById('progressFill').style.width=pct+'%';
+}
+
+function upBadge(s){
+  var el=document.getElementById('b_'+s.replace(/[^a-z0-9]/gi,'_'));
+  if(!el)return;
+  el.textContent=sD[s]+'/'+sT[s];
+  el.classList.toggle('done',sD[s]===sT[s]);
+}
+
+function handleVideo(e){
+  var f=e.target.files[0];if(!f)return;
+  document.getElementById('videoPlayer').src=URL.createObjectURL(f);
+  document.getElementById('videoPreview').style.display='block';
+  videoOk=true;upBtn();
+}
+
+function upBtn(){
+  var btn=document.getElementById('btnFinalizar');
+  var st=document.getElementById('btnStatus');
+  var allOk=done===total,ready=allOk&&videoOk;
+  btn.classList.toggle('active',ready);
+  if(ready){btn.textContent='&#9989; Finalizar Checklist';}
+  else{btn.textContent='&#128274; Finalize o Checklist';}
+  if(!allOk&&!videoOk)st.textContent='Marque todos os itens e anexe o video';
+  else if(!allOk)st.textContent=(total-done)+' itens pendentes';
+  else if(!videoOk)st.textContent='Falta apenas o video!';
+  else st.textContent='Tudo pronto! Toque em Finalizar.';
+}
+
+function finalizar(){
+  var now=new Date();
+  dtFinal=now.toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  var ud=UNIDADES[u];
+  document.getElementById('successUnidade').textContent=ud.nome;
+  document.getElementById('successDateTime').textContent='Data: '+dtFinal;
+  // Resumo
+  var r='<h4>Resumo da Vistoria</h4>';
+  cl.forEach(function(sec){
+    var ok=sD[sec.s]===sT[sec.s];
+    r+='<div class="resumo-item"><span>'+sec.s+'</span><span class="resumo-ok">'+(ok?'&#9989;':'')+' '+sD[sec.s]+'/'+sT[sec.s]+'</span></div>';
+  });
+  r+='<div class="resumo-item" style="margin-top:4px"><span>Video</span><span class="resumo-ok">&#9989; Anexado</span></div>';
+  document.getElementById('resumoBox').innerHTML=r;
+  document.getElementById('successScreen').classList.add('show');
+  window.scrollTo(0,0);
+}
+
+function gerarMsg(){
+  var ud=UNIDADES[u];
+  var l=[];
+  l.push('*CHECKLIST ESPACO FITNESS*');
+  l.push('*'+ud.nome.toUpperCase()+'*');
+  l.push('Data: '+dtFinal);
+  l.push('');
+  cl.forEach(function(sec){
+    var ok=sD[sec.s]===sT[sec.s]?'OK':'';
+    l.push((ok?'[OK] ':'[..] ')+sec.s+' ('+sD[sec.s]+'/'+sT[sec.s]+')');
+  });
+  l.push('');
+  l.push('Video: ANEXADO');
+  l.push('');
+  l.push('STATUS: *APROVADO* - '+total+'/'+total+' itens concluidos');
+  return encodeURIComponent(l.join('
+'));
+}
+
+function enviarWhatsapp(tipo){
+  var msg=gerarMsg();
+  if(tipo==='direto'){
+    var num=document.getElementById('whatsappNumber').value.replace(/D/g,'');
+    if(!num||num.length<10){alert('Insira um numero valido com DDD (ex: 5511999999999)');return;}
+    window.open('https://wa.me/'+num+'?text='+msg,'_blank');
+  } else {
+    var link=document.getElementById('whatsappGroupLink').value.trim();
+    if(!link||link.indexOf('chat.whatsapp.com')===-1){
+      // Se nao tem link de grupo, tenta abrir wa.me sem numero para selecionar
+      if(confirm('Nao encontrei um link de grupo valido.
+Deseja abrir o WhatsApp para escolher o grupo manualmente?')){
+        window.open('https://api.whatsapp.com/send?text='+msg,'_blank');
+      }
+      return;
+    }
+    // Abre o grupo e copia a mensagem
+    var decoded=decodeURIComponent(msg);
+    try{navigator.clipboard.writeText(decoded);}catch(e){}
+    alert('Mensagem copiada! Cole no grupo apos entrar.');
+    window.open(link,'_blank');
+  }
+}
+
+function voltarSelecao(){
+  document.getElementById('appScreen').style.display='none';
+  document.getElementById('footerFixed').classList.remove('visible');
+  document.getElementById('selectScreen').style.display='flex';
+  document.getElementById('fileInput').value='';
+  window.scrollTo(0,0);
+}
+
+function reiniciar(){
+  document.getElementById('successScreen').classList.remove('show');
+  voltarSelecao();
+}
+</script>
+</body>
+</html>
